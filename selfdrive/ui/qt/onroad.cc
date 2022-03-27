@@ -224,7 +224,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
   });
   dlpBtn->setFixedWidth(200);
   dlpBtn->setFixedHeight(200);
-  btns_layout->addWidget(dlpBtn, 0, Qt::AlignLeft);
+  btns_layout->addWidget(dlpBtn, 0, Qt::AlignRight);
   btns_layout->addSpacing(35);
 
   if (QUIState::ui_state.scene.end_to_end) {
@@ -319,7 +319,6 @@ void OnroadAlerts::paintEvent(QPaintEvent *event) {
 // OnroadHud
 OnroadHud::OnroadHud(QWidget *parent) : QWidget(parent) {
   engage_img = QPixmap("../assets/img_chffr_wheel.png").scaled(img_size, img_size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-  dm_img = QPixmap("../assets/img_driver_face.png").scaled(img_size, img_size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
   how_img = QPixmap("../assets/img_hands_on_wheel.png").scaled(img_size, img_size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
   map_img = QPixmap("../assets/img_world_icon.png").scaled(subsign_img_size, subsign_img_size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
   left_img = QPixmap("../assets/img_turn_left_icon.png").scaled(subsign_img_size, subsign_img_size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -345,28 +344,23 @@ void OnroadHud::updateState(const UIState &s) {
   setProperty("speed", QString::number(std::nearbyint(cur_speed)));
   setProperty("maxSpeed", maxspeed_str);
   setProperty("speedUnit", s.scene.is_metric ? "km/h" : "mph");
-  setProperty("hideDM", cs.getAlertSize() != cereal::ControlsState::AlertSize::NONE);
   setProperty("status", s.status);
 
-  // update engageability and DM icons at 2Hz
+  // update icons at 2Hz
   if (sm.frame % (UI_FREQ / 2) == 0) {
     const auto howState = sm["driverMonitoringState"].getDriverMonitoringState().getHandsOnWheelState();
 
     setProperty("engageable", cs.getEngageable() || cs.getEnabled());
-    setProperty("dmActive", sm["driverMonitoringState"].getDriverMonitoringState().getIsActiveMode());
     setProperty("showHowAlert", howState >= cereal::DriverMonitoringState::HandsOnWheelState::WARNING);
     setProperty("howWarning", howState == cereal::DriverMonitoringState::HandsOnWheelState::WARNING);
 
     const auto lp = sm["longitudinalPlan"].getLongitudinalPlan();
     const auto vtcState = lp.getVisionTurnControllerState();
     const float vtc_speed = lp.getVisionTurnSpeed() * (s.scene.is_metric ? MS_TO_KPH : MS_TO_MPH);
-    const auto lpSoruce = lp.getLongitudinalPlanSource();
-    QColor vtc_color = tcs_colors[int(vtcState)];
-    vtc_color.setAlpha(lpSoruce == cereal::LongitudinalPlan::LongitudinalPlanSource::TURN ? 255 : 100);
 
     setProperty("showVTC", vtcState > cereal::LongitudinalPlan::VisionTurnControllerState::DISABLED);
     setProperty("vtcSpeed", QString::number(std::nearbyint(vtc_speed)));
-    setProperty("vtcColor", vtc_color);
+    setProperty("vtcColor", QColor(0xff, 0xff, 0xff, 100));
     setProperty("showDebugUI", s.scene.show_debug_ui);
 
     const auto lmd = sm["liveMapData"].getLiveMapData();
@@ -443,15 +437,13 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
   configFont(p, "Open Sans", 66, "Regular");
   drawText(p, rect().center().x(), 290, speedUnit, 200);
 
-  if (engageable) {
-    if (showDebugUI && showVTC) {
-      drawVisionTurnControllerUI(p, rect().right() - 184 - bdr_s, int(bdr_s * 1.5), 184, vtcColor, vtcSpeed, 100);
-    } else {
-      // engage-ability icon
-      drawIcon(p, rect().right() - radius / 2 - bdr_s * 2, radius / 2 + int(bdr_s * 1.5),
-               engage_img, bg_colors[status], 1.0);
-    }
+  if (is_cruise_set) {
+    drawVisionTurnControllerUI(p, rect().right() - 220 - bdr_s, int(bdr_s * 1.5), 184, vtcColor, vtcSpeed, 100);
+  } else {
+    drawVisionTurnControllerUI(p, rect().right() - 220 - bdr_s, int(bdr_s * 1.5), 184, vtcColor, maxSpeed, 100);
+  }
 
+  if (engageable) {
     // Hands on wheel icon
     if (showHowAlert) {
       drawIcon(p, rect().right() - radius / 2 - bdr_s * 2, int(bdr_s * 1.5) + 2 * radius + bdr_s + radius / 2,
@@ -468,12 +460,6 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
       rc.moveTop(speed_sgn_rc.bottom() + bdr_s);
       drawTrunSpeedSign(p, rc, turnSpeedLimit, tscSubText, curveSign, tscActive);
     }
-  }
-
-  // dm icon
-  if (!hideDM) {
-    drawIcon(p, radius / 2 + (bdr_s * 2), rect().bottom() - footer_h / 2,
-             dm_img, QColor(0, 0, 0, 70), dmActive ? 1.0 : 0.2);
   }
 
   // Bottom bar road name
@@ -518,14 +504,21 @@ void OnroadHud::drawIcon(QPainter &p, int x, int y, QPixmap &img, QBrush bg, flo
 
 void OnroadHud::drawVisionTurnControllerUI(QPainter &p, int x, int y, int size, const QColor &color,
                                            const QString &vision_speed, int alpha) {
-  QRect rvtc(x, y, size, size);
-  p.setPen(QPen(color, 10));
-  p.setBrush(QColor(0, 0, 0, alpha));
+  QRect rvtc(x, y, 184, 202);
+  p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 10));
+  p.setBrush(QColor(0, 0, 0, 100));
   p.drawRoundedRect(rvtc, 20, 20);
   p.setPen(Qt::NoPen);
 
-  configFont(p, "Open Sans", 56, "SemiBold");
-  drawCenteredText(p, rvtc.center().x(), rvtc.center().y(), vision_speed, color);
+  configFont(p, "Open Sans", 48, "Regular");
+  drawText(p, rvtc.center().x(), 118, "Curve", is_cruise_set ? 200 : 100);
+  if (is_cruise_set) {
+    configFont(p, "Open Sans", 88, is_cruise_set ? "Bold" : "SemiBold");
+    drawText(p, rvtc.center().x(), 212, vision_speed, 255);
+  } else {
+    configFont(p, "Open Sans", 80, "SemiBold");
+    drawText(p, rvtc.center().x(), 212, vision_speed, 100);
+  }
 }
 
 void OnroadHud::drawCircle(QPainter &p, int x, int y, int r, QBrush bg) {
@@ -653,27 +646,25 @@ void NvgWindow::drawLaneLines(QPainter &painter, const UIScene &scene) {
   int steerOverride = (*s->sm)["carState"].getCarState().getSteeringPressed();
   bool madsEnabled = (*s->sm)["controlsState"].getControlsState().getMadsEnabled();
   bool suspended = (*s->sm)["controlsState"].getControlsState().getSuspended();
-  if (!scene.lateralPlan.dynamicLaneProfileStatus) {
-    // lanelines
-    for (int i = 0; i < std::size(scene.lane_line_vertices); ++i) {
-      if (i == 1 || i == 2) {
-        // TODO: can we just use the projected vertices somehow?
-        const cereal::ModelDataV2::XYZTData::Reader &line = (*s->sm)["modelV2"].getModelV2().getLaneLines()[i];
-        const float default_pos = 1.4;  // when lane poly isn't available
-        const float lane_pos = line.getY().size() > 0 ? std::abs(line.getY()[5]) : default_pos;  // get redder when line is closer to car
-        float hue = 332.5 * lane_pos - 332.5;  // equivalent to {1.4, 1.0}: {133, 0} (green to red)
-        hue = std::fmin(133, fmax(0, hue)) / 360.;  // clip and normalize
-        painter.setBrush(QColor(23, 134, 68, 241));
-      } else {
-        painter.setBrush(QColor(23, 134, 68, 241));
-      }
-      painter.drawPolygon(scene.lane_line_vertices[i].v, scene.lane_line_vertices[i].cnt);
-    }
-    // road edges
-    for (int i = 0; i < std::size(scene.road_edge_vertices); ++i) {
+  // lanelines
+  for (int i = 0; i < std::size(scene.lane_line_vertices); ++i) {
+    if (i == 1 || i == 2) {
+      // TODO: can we just use the projected vertices somehow?
+      const cereal::ModelDataV2::XYZTData::Reader &line = (*s->sm)["modelV2"].getModelV2().getLaneLines()[i];
+      const float default_pos = 1.4;  // when lane poly isn't available
+      const float lane_pos = line.getY().size() > 0 ? std::abs(line.getY()[5]) : default_pos;  // get redder when line is closer to car
+      float hue = 332.5 * lane_pos - 332.5;  // equivalent to {1.4, 1.0}: {133, 0} (green to red)
+      hue = std::fmin(133, fmax(0, hue)) / 360.;  // clip and normalize
       painter.setBrush(QColor(23, 134, 68, 241));
-      painter.drawPolygon(scene.road_edge_vertices[i].v, scene.road_edge_vertices[i].cnt);
+    } else {
+      painter.setBrush(QColor(23, 134, 68, 241));
     }
+    painter.drawPolygon(scene.lane_line_vertices[i].v, scene.lane_line_vertices[i].cnt);
+  }
+  // road edges
+  for (int i = 0; i < std::size(scene.road_edge_vertices); ++i) {
+    painter.setBrush(QColor(23, 134, 68, 241));
+    painter.drawPolygon(scene.road_edge_vertices[i].v, scene.road_edge_vertices[i].cnt);
   }
   // paint path
   QLinearGradient bg(0, height(), 0, height() / 4);
@@ -739,14 +730,12 @@ void NvgWindow::paintGL() {
 
     drawLaneLines(painter, s->scene);
 
-    if (s->scene.longitudinal_control) {
-      auto leads = (*s->sm)["modelV2"].getModelV2().getLeadsV3();
-      if (leads[0].getProb() > .5) {
-        drawLead(painter, leads[0], s->scene.lead_vertices[0]);
-      }
-      if (leads[1].getProb() > .5 && (std::abs(leads[1].getX()[0] - leads[0].getX()[0]) > 3.0)) {
-        drawLead(painter, leads[1], s->scene.lead_vertices[1]);
-      }
+    auto leads = (*s->sm)["modelV2"].getModelV2().getLeadsV3();
+    if (leads[0].getProb() > .5) {
+      drawLead(painter, leads[0], s->scene.lead_vertices[0]);
+    }
+    if (leads[1].getProb() > .5 && (std::abs(leads[1].getX()[0] - leads[0].getX()[0]) > 3.0)) {
+      drawLead(painter, leads[1], s->scene.lead_vertices[1]);
     }
   }
 
