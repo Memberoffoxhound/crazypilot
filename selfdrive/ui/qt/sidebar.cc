@@ -87,7 +87,7 @@ void Sidebar::paintEvent(QPaintEvent *event) {
   p.fillRect(rect(), QColor(57, 57, 57));
 
   // static imgs
-  p.setOpacity(0.65);
+  p.setOpacity(1.0);
   p.drawImage(settings_btn.x(), settings_btn.y(), settings_img);
   p.setOpacity(1.0);
   p.drawImage(60, 1080 - 180 - 40, home_img);

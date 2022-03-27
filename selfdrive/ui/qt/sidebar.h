@@ -44,7 +44,7 @@ protected:
   };
 
   const QRect settings_btn = QRect(50, 35, 200, 117);
-  const QColor good_color = QColor(255, 255, 255);
+  const QColor good_color = QColor(23, 134, 68);
   const QColor warning_color = QColor(218, 202, 37);
   const QColor danger_color = QColor(201, 34, 49);
 

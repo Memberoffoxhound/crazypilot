@@ -663,15 +663,15 @@ void NvgWindow::drawLaneLines(QPainter &painter, const UIScene &scene) {
         const float lane_pos = line.getY().size() > 0 ? std::abs(line.getY()[5]) : default_pos;  // get redder when line is closer to car
         float hue = 332.5 * lane_pos - 332.5;  // equivalent to {1.4, 1.0}: {133, 0} (green to red)
         hue = std::fmin(133, fmax(0, hue)) / 360.;  // clip and normalize
-        painter.setBrush(QColor::fromHslF(hue, 1.0, 0.50, scene.lane_line_probs[i]));
+        painter.setBrush(QColor(23, 134, 68, 241));
       } else {
-        painter.setBrush(QColor::fromRgbF(1.0, 1.0, 1.0, scene.lane_line_probs[i]));
+        painter.setBrush(QColor(23, 134, 68, 241));
       }
       painter.drawPolygon(scene.lane_line_vertices[i].v, scene.lane_line_vertices[i].cnt);
     }
     // road edges
     for (int i = 0; i < std::size(scene.road_edge_vertices); ++i) {
-      painter.setBrush(QColor::fromRgbF(1.0, 0, 0, std::clamp<float>(1.0 - scene.road_edge_stds[i], 0.0, 1.0)));
+      painter.setBrush(QColor(23, 134, 68, 241));
       painter.drawPolygon(scene.road_edge_vertices[i].v, scene.road_edge_vertices[i].cnt);
     }
   }
@@ -682,15 +682,15 @@ void NvgWindow::drawLaneLines(QPainter &painter, const UIScene &scene) {
       bg.setColorAt(0, blackColor(80));
       bg.setColorAt(1, blackColor(20));
     } else if (suspended) {
-      bg.setColorAt(0, QColor(255, 255, 255));
-      bg.setColorAt(1, QColor(255, 255, 255, 0));
+      bg.setColorAt(0, QColor(23, 134, 68));
+      bg.setColorAt(1, QColor(23, 134, 68, 241));
     } else {
-      bg.setColorAt(0, scene.lateralPlan.dynamicLaneProfileStatus ? redColor() : greenColor());
-      bg.setColorAt(1, scene.lateralPlan.dynamicLaneProfileStatus ? redColor(0) : greenColor(0));
+      bg.setColorAt(0, scene.lateralPlan.dynamicLaneProfileStatus ? graceBlueColor() : greenColor());
+      bg.setColorAt(1, scene.lateralPlan.dynamicLaneProfileStatus ? graceBlueColor(0) : greenColor(0));
     }
   } else {
-    bg.setColorAt(0, QColor(255, 255, 255));
-    bg.setColorAt(1, QColor(255, 255, 255, 0));
+    bg.setColorAt(0, QColor(23, 134, 68));
+    bg.setColorAt(1, QColor(23, 134, 68));
   }
   painter.setBrush(bg);
   painter.drawPolygon(scene.track_vertices.v, scene.track_vertices.cnt);
@@ -724,7 +724,7 @@ void NvgWindow::drawLead(QPainter &painter, const cereal::ModelDataV2::LeadDataV
 
   // chevron
   QPointF chevron[] = {{x + (sz * 1.25), y + sz}, {x, y}, {x - (sz * 1.25), y + sz}};
-  painter.setBrush(redColor(fillAlpha));
+  painter.setBrush(greenColor(fillAlpha));
   painter.drawPolygon(chevron, std::size(chevron));
 }
 
