@@ -403,48 +403,48 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
     ET.WARNING: Alert(
       "Pay Attention",
       "",
-      AlertStatus.normal, AlertSize.small,
-      Priority.LOW, VisualAlert.none, AudibleAlert.none, .1),
+      AlertStatus.normal, AlertSize.none,
+      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .1),
   },
 
   EventName.promptDriverDistracted: {
     ET.WARNING: Alert(
       "Pay Attention",
       "Driver Distracted",
-      AlertStatus.userPrompt, AlertSize.mid,
-      Priority.MID, VisualAlert.steerRequired, AudibleAlert.promptDistracted, .1),
+      AlertStatus.normal, AlertSize.none,
+      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .1),
   },
 
   EventName.driverDistracted: {
     ET.WARNING: Alert(
       "DISENGAGE IMMEDIATELY",
       "Driver Distracted",
-      AlertStatus.critical, AlertSize.full,
-      Priority.HIGH, VisualAlert.steerRequired, AudibleAlert.warningImmediate, .1),
+      AlertStatus.normal, AlertSize.none,
+      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .1),
   },
 
   EventName.preDriverUnresponsive: {
     ET.WARNING: Alert(
       "Touch Steering Wheel: No Face Detected",
       "",
-      AlertStatus.normal, AlertSize.small,
-      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.none, .1, alert_rate=0.75),
+      AlertStatus.normal, AlertSize.none,
+      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .1),
   },
 
   EventName.promptDriverUnresponsive: {
     ET.WARNING: Alert(
       "Touch Steering Wheel",
       "Driver Unresponsive",
-      AlertStatus.userPrompt, AlertSize.mid,
-      Priority.MID, VisualAlert.steerRequired, AudibleAlert.promptDistracted, .1),
+      AlertStatus.normal, AlertSize.none,
+      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .1),
   },
 
   EventName.driverUnresponsive: {
     ET.WARNING: Alert(
       "DISENGAGE IMMEDIATELY",
       "Driver Unresponsive",
-      AlertStatus.critical, AlertSize.full,
-      Priority.HIGH, VisualAlert.steerRequired, AudibleAlert.warningImmediate, .1),
+      AlertStatus.normal, AlertSize.none,
+      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .1),
   },
 
   EventName.preKeepHandsOnWheel: {
@@ -681,13 +681,11 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
   },
 
   EventName.tooDistracted: {
-    ET.NO_ENTRY: NoEntryAlert("Distraction Level Too High"),
+    #ET.NO_ENTRY: NoEntryAlert("Distraction Level Too High"),
   },
 
   EventName.overheat: {
-    ET.PERMANENT: NormalPermanentAlert("System Overheated"),
-    ET.SOFT_DISABLE: soft_disable_alert("System Overheated"),
-    ET.NO_ENTRY: NoEntryAlert("System Overheated"),
+    ET.WARNING: NormalPermanentAlert("System Overheated"),
   },
 
   EventName.wrongGear: {
@@ -726,13 +724,11 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
   },
 
   EventName.doorOpen: {
-    ET.SOFT_DISABLE: user_soft_disable_alert("Door Open"),
-    ET.NO_ENTRY: NoEntryAlert("Door Open"),
+    ET.WARNING: NormalPermanentAlert("Door Open"),
   },
 
   EventName.seatbeltNotLatched: {
-    ET.SOFT_DISABLE: user_soft_disable_alert("Seatbelt Unlatched"),
-    ET.NO_ENTRY: NoEntryAlert("Seatbelt Unlatched"),
+    ET.WARNING: NormalPermanentAlert("Seatbelt Unlatched"),
   },
 
   EventName.espDisabled: {

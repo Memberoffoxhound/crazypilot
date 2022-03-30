@@ -52,8 +52,8 @@ OVERLAY_METADATA = os.path.join(STAGING_ROOT, "metadata")
 OVERLAY_MERGED = os.path.join(STAGING_ROOT, "merged")
 FINALIZED = os.path.join(STAGING_ROOT, "finalized")
 
-DAYS_NO_CONNECTIVITY_MAX = 14     # do not allow to engage after this many days
-DAYS_NO_CONNECTIVITY_PROMPT = 10  # send an offroad prompt after this many days
+DAYS_NO_CONNECTIVITY_MAX = 365     # do not allow to engage after a year
+DAYS_NO_CONNECTIVITY_PROMPT = 365  # send an offroad prompt after a year
 
 class WaitTimeHelper:
   def __init__(self, proc):
@@ -417,12 +417,11 @@ def main():
     update_now = wait_helper.ready_event.is_set()
     wait_helper.ready_event.clear()
 
-    # Don't run updater while onroad or if the time's wrong
+    # Don't run updater if the time's wrong
     time_wrong = datetime.datetime.utcnow().year < 2019
-    is_onroad = not params.get_bool("IsOffroad")
-    if is_onroad or time_wrong:
+    if time_wrong:
       wait_helper.sleep(30)
-      cloudlog.info("not running updater, not offroad")
+      cloudlog.info("not running updater, time wrong")
       continue
 
     # Attempt an update
