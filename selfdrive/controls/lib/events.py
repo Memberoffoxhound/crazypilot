@@ -392,11 +392,7 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
   },
 
   EventName.steerTempUnavailableSilent: {
-    ET.WARNING: Alert(
-      "Steering Temporarily Unavailable",
-      "",
-      AlertStatus.userPrompt, AlertSize.small,
-      Priority.LOW, VisualAlert.steerRequired, AudibleAlert.prompt, 1.),
+    ET.WARNING: NormalPermanentAlert("Steering Temporarily Unavailable"),
   },
 
   EventName.preDriverDistracted: {
@@ -623,19 +619,11 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
   },
 
   EventName.pedalPressed: {
-    ET.USER_DISABLE: EngagementAlert(AudibleAlert.disengage),
-    ET.NO_ENTRY: NoEntryAlert("Pedal Pressed",
-                              visual_alert=VisualAlert.brakePressed),
+    ET.WARNING: NormalPermanentAlert("Brake Pressed"),
   },
 
   EventName.silentPedalPressed: {
-    ET.USER_DISABLE: Alert(
-      "",
-      "",
-      AlertStatus.normal, AlertSize.none,
-      Priority.MID, VisualAlert.none, AudibleAlert.none, .2),
-    ET.NO_ENTRY: NoEntryAlert("Pedal Pressed During Attempt",
-                              visual_alert=VisualAlert.brakePressed),
+    ET.WARNING: NormalPermanentAlert("Brake Pressed"),
   },
 
   EventName.wrongCarMode: {
@@ -689,8 +677,7 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
   },
 
   EventName.wrongGear: {
-    ET.SOFT_DISABLE: user_soft_disable_alert("Gear not D"),
-    ET.NO_ENTRY: NoEntryAlert("Gear not D"),
+    ET.NO_ENTRY: NoEntryAlert("Vehicle not in Drive"),
   },
 
   EventName.silentWrongGear: {
@@ -860,13 +847,7 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
   },
 
   EventName.reverseGear: {
-    ET.PERMANENT: Alert(
-      "Reverse\nGear",
-      "",
-      AlertStatus.normal, AlertSize.full,
-      Priority.LOWEST, VisualAlert.none, AudibleAlert.none, .2, creation_delay=0.5),
-    ET.USER_DISABLE: ImmediateDisableAlert("Reverse Gear"),
-    ET.NO_ENTRY: NoEntryAlert("Reverse Gear"),
+    ET.WARNING: NormalPermanentAlert("Vehicle is in Reverse"),
   },
 
   # On cars that use stock ACC the car can decide to cancel ACC for various reasons.

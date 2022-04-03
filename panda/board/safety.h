@@ -215,9 +215,9 @@ void generic_rx_checks(bool stock_ecu_detected) {
   if (brake_pressed && (!brake_pressed_prev || vehicle_moving)) {
     if(controls_allowed == 1)
     {
-      disengageFromBrakes = true;
+      disengageFromBrakes = false;
     }
-    controls_allowed = 0;
+    controls_allowed = 1;
   } else if (!brake_pressed && disengageFromBrakes)
   {
     disengageFromBrakes = false;
