@@ -81,7 +81,7 @@ void MainWindow::closeSettings() {
   main_layout->setCurrentWidget(homeWindow);
 
   if (QUIState::ui_state.scene.started) {
-    homeWindow->showSidebar(false);
+    homeWindow->showSidebar(true);
   }
 }
 

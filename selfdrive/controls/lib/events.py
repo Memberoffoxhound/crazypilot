@@ -525,7 +525,7 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
 
   EventName.manualLongitudinalRequired: {
     ET.WARNING: Alert(
-      "Smart/Adaptive Cruise Control is OFF",
+      "Adaptive Cruise Control is OFF",
       "Manual Gas/Brakes Required",
       AlertStatus.normal, AlertSize.mid,
       Priority.LOW, VisualAlert.none, AudibleAlert.none, 2.),
@@ -619,11 +619,11 @@ EVENTS: Dict[int, Dict[str, Union[Alert, AlertCallbackType]]] = {
   },
 
   EventName.pedalPressed: {
-    ET.WARNING: NormalPermanentAlert("Brake Pressed"),
+    #ET.WARNING: NormalPermanentAlert("Brake Pressed"),
   },
 
   EventName.silentPedalPressed: {
-    ET.WARNING: NormalPermanentAlert("Brake Pressed"),
+    #ET.WARNING: NormalPermanentAlert("Brake Pressed"),
   },
 
   EventName.wrongCarMode: {

@@ -31,46 +31,40 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
   // param, title, desc, icon
   std::vector<std::tuple<QString, QString, QString, QString>> toggles{
     {
-      "OpenpilotEnabledToggle",
-      "Enable openpilot",
-      "Use the openpilot system for adaptive cruise control and lane keep driver assistance. Your attention is required at all times to use this feature. Changing this setting takes effect when the car is powered off.",
-      "../assets/offroad/icon_openpilot.png",
+      "DisableOnroadUploads",
+      "Disable Onroad Uploads",
+      "Disable uploads completely when onroad. Necessary to avoid high data usage when connected to Wi-Fi hotspot. Turn on this feature if you are looking to utilize map-based features, such as Speed Limit Control and Map Data Turn Control",
+      "../assets/offroad/icon_network.png",
     },
     {
-      "IsLdwEnabled",
-      "Enable Lane Departure Warnings",
-      "Receive alerts to steer back into the lane when your vehicle drifts over a detected lane line without a turn signal activated while driving over 31mph (50kph).",
-      "../assets/offroad/icon_warning.png",
-    },
-    {
-      "IsRHD",
-      "Enable Right-Hand Drive",
-      "Allow openpilot to obey left-hand traffic conventions and perform driver monitoring on right driver seat.",
-      "../assets/offroad/icon_openpilot_mirrored.png",
-    },
-    {
-      "IsMetric",
-      "Use Metric System",
-      "Display speed in km/h instead of mph.",
-      "../assets/offroad/icon_metric.png",
-    },
-    {
-      "CommunityFeaturesToggle",
-      "Enable Community Features",
-      "Use features, such as community supported hardware, from the open source community that are not maintained or supported by comma.ai and have not been confirmed to meet the standard safety model. Be extra cautious when using these features",
-      "../assets/offroad/icon_shell.png",
-    },
-    {
-      "RecordFront",
-      "Record and Upload Driver Camera",
-      "Upload data from the driver facing camera and help improve the driver monitoring algorithm.",
-      "../assets/offroad/icon_monitoring.png",
-    },
-    {
-      "EndToEndToggle",
-      "\U0001f96c Disable use of lanelines (Alpha) \U0001f96c",
-      "In this mode openpilot will ignore lanelines and just drive how it thinks a human would.",
+      "TurnVisionControl",
+      "Enable vision based turn control",
+      "Use vision path predictions to estimate the appropiate speed to drive through turns ahead.",
       "../assets/offroad/icon_road.png",
+    },
+    {
+      "ShowDebugUI",
+      "Show debug UI elements",
+      "Show UI elements that aid debugging.",
+      "../assets/offroad/icon_calibration.png",
+    },
+    {
+      "SpeedLimitControl",
+      "Enable Speed Limit Control",
+      "Use speed limit signs information from map data and car interface to automatically adapt cruise speed to road limits.",
+      "../assets/offroad/icon_speed_limit.png",
+    },
+    {
+      "SpeedLimitPercOffset",
+      "Enable Speed Limit Offset",
+      "Set speed limit slightly higher than actual speed limit for a more natural drive.",
+      "../assets/offroad/icon_speed_limit.png",
+    },
+    {
+      "EnableDebugSnapshot",
+      "Debug snapshot on screen center tap",
+      "Stores snapshot file with current state of some modules.",
+      "../assets/offroad/icon_calibration.png",
     },
 #ifdef ENABLE_MAPS
     {
@@ -456,7 +450,6 @@ SunnypilotPanel::SunnypilotPanel(QWidget* parent) : QWidget(parent) {
   home_widget->setObjectName("homeWidget");
 
   ScrollView *scroller = new ScrollView(home_widget, this);
-  scroller->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
   fcr_layout->addWidget(scroller, 1);
 
   main_layout->addWidget(home);
@@ -488,79 +481,6 @@ SunnypilotPanel::SunnypilotPanel(QWidget* parent) : QWidget(parent) {
   )");
 
   QList<ParamControl*> toggles;
-
-  toggles.append(new ParamControl("QuietDrive",
-                                  "Quiet Drive 🤫",
-                                  "openpilot will display alerts but only play the most important warning sounds. This feature can be toggled while the car is on.",
-                                  "../assets/offroad/icon_mute.png",
-                                  this));
-
-  toggles.append(new ParamControl("PrebuiltOn",
-                                  "Fast Boot (Prebuilt)",
-                                  "openpilot will fast boot by creating a Prebuilt file. Note: Turn off this feature if you have made any UI changes!",
-                                  "../assets/offroad/icon_shell.png",
-                                  this));
-
-  toggles.append(new ParamControl("DisableOnroadUploads",
-                                  "Disable Onroad Uploads",
-                                  "Disable uploads completely when onroad. Necessary to avoid high data usage when connected to Wi-Fi hotspot. Turn on this feature if you are looking to utilize map-based features, such as Speed Limit Control and Map Data Turn Control",
-                                  "../assets/offroad/icon_network.png",
-                                  this));
-
-  toggles.append(new ParamControl("ProcessNotRunningOff",
-                                 "Bypass \"System Malfunction\" Error",
-                                 "Prevent openpilot from returning the \"System Malfunction\" alert that hinders the ability use openpilot. Turn on this feature if you experience this alert frequently.",
-                                 "../assets/offroad/icon_shell.png",
-                                 this));
-
-  toggles.append(new ParamControl("DisableMADS",
-                                  "Disable M.A.D.S.",
-                                  "Disable the beloved M.A.D.S. feature. Enable Stock openpilot engagement/disengagement.",
-                                  "../assets/offroad/icon_openpilot.png",
-                                  this));
-
-  toggles.append(new ParamControl("HandsOnWheelMonitoring",
-                                  "Enable Hands on Wheel Monitoring",
-                                  "Monitor and alert when driver is not keeping the hands on the steering wheel.",
-                                  "../assets/offroad/icon_openpilot.png",
-                                  this));
-
-  toggles.append(new ParamControl("TurnVisionControl",
-                                  "Enable vision based turn control",
-                                  "Use vision path predictions to estimate the appropiate speed to drive through turns ahead.",
-                                  "../assets/offroad/icon_road.png",
-                                  this));
-
-  toggles.append(new ParamControl("ShowDebugUI",
-                                  "Show debug UI elements",
-                                  "Show UI elements that aid debugging.",
-                                  "../assets/offroad/icon_calibration.png",
-                                  this));
-
-  toggles.append(new ParamControl("SpeedLimitControl",
-                                  "Enable Speed Limit Control",
-                                  "Use speed limit signs information from map data and car interface to automatically adapt cruise speed to road limits.",
-                                  "../assets/offroad/icon_speed_limit.png",
-                                  this));
-
-  toggles.append(new ParamControl("SpeedLimitPercOffset",
-                                  "Enable Speed Limit Offset",
-                                  "Set speed limit slightly higher than actual speed limit for a more natural drive.",
-                                  "../assets/offroad/icon_speed_limit.png",
-                                  this));
-
-  toggles.append(new ParamControl("TurnSpeedControl",
-                                  "Enable Map Data Turn Control",
-                                  "Use curvature info from map data to define speed limits to take turns ahead",
-                                  "../assets/offroad/icon_openpilot.png",
-                                  this));
-
-  toggles.append(new ParamControl("EnableDebugSnapshot",
-                                  "Debug snapshot on screen center tap",
-                                  "Stores snapshot file with current state of some modules.",
-                                  "../assets/offroad/icon_calibration.png",
-                                  this));
-
   for (ParamControl *toggle : toggles) {
     if (main_layout->count() != 0) {
       toggle_layout->addWidget(horizontal_line());
