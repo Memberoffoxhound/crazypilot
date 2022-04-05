@@ -31,6 +31,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
   // param, title, desc, icon
   std::vector<std::tuple<QString, QString, QString, QString>> toggles{
     {
+      "OpenpilotEnabledToggle",
+      "Enable openpilot",
+      "Use the openpilot system for adaptive cruise control and lane keep driver assistance. Your attention is required at all times to use this feature. Changing this setting takes effect when the car is powered off.",
+      "../assets/offroad/icon_openpilot.png",
+    },
+    {
       "DisableOnroadUploads",
       "Disable Onroad Uploads",
       "Disable uploads completely when onroad. Necessary to avoid high data usage when connected to Wi-Fi hotspot. Turn on this feature if you are looking to utilize map-based features, such as Speed Limit Control and Map Data Turn Control",
@@ -66,14 +72,6 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "Stores snapshot file with current state of some modules.",
       "../assets/offroad/icon_calibration.png",
     },
-#ifdef ENABLE_MAPS
-    {
-      "NavSettingTime24h",
-      "Show ETA in 24h format",
-      "Use 24h format instead of am/pm",
-      "../assets/offroad/icon_metric.png",
-    },
-#endif
 
   };
 
