@@ -72,6 +72,12 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "Stores snapshot file with current state of some modules.",
       "../assets/offroad/icon_calibration.png",
     },
+    {
+      "ACCMADSCombo",
+      "Enable ACC+MADS with RES+/SET-",
+      "Engage both ACC and MADS with a single press of RES+ or SET- button.\nNote: Once MADS is engaged via this mode, it will remain engaged until it is manually disabled via LFA/LKAS/Cruise MAIN button or car shut off.",
+      "../assets/offroad/icon_openpilot.png",
+    },
 
   };
 
@@ -479,6 +485,7 @@ SunnypilotPanel::SunnypilotPanel(QWidget* parent) : QWidget(parent) {
   )");
 
   QList<ParamControl*> toggles;
+
   for (ParamControl *toggle : toggles) {
     if (main_layout->count() != 0) {
       toggle_layout->addWidget(horizontal_line());
