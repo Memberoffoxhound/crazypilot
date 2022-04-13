@@ -43,12 +43,6 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_network.png",
     },
     {
-      "TurnVisionControl",
-      "Enable vision based turn control",
-      "Use vision path predictions to estimate the appropiate speed to drive through turns ahead.",
-      "../assets/offroad/icon_road.png",
-    },
-    {
       "ShowDebugUI",
       "Show debug UI elements",
       "Show UI elements that aid debugging.",
@@ -67,18 +61,17 @@ TogglesPanel::TogglesPanel(SettingsWindow *parent) : ListWidget(parent) {
       "../assets/offroad/icon_speed_limit.png",
     },
     {
-      "EnableDebugSnapshot",
-      "Debug snapshot on screen center tap",
-      "Stores snapshot file with current state of some modules.",
-      "../assets/offroad/icon_calibration.png",
-    },
-    {
       "ACCMADSCombo",
       "Enable ACC+MADS with RES+/SET-",
       "Engage both ACC and MADS with a single press of RES+ or SET- button.\nNote: Once MADS is engaged via this mode, it will remain engaged until it is manually disabled via LFA/LKAS/Cruise MAIN button or car shut off.",
       "../assets/offroad/icon_openpilot.png",
     },
-
+    {
+      "QuietDrive",
+      "Quiet Drive 🤫",
+      "openpilot will display alerts but only play the most important warning sounds. This feature can be toggled while the car is on.",
+      "../assets/offroad/icon_mute.png",
+    },
   };
 
   Params params;
@@ -359,7 +352,6 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QFrame(parent) {
     {"Network", network_panel(this)},
     {"Toggles", new TogglesPanel(this)},
     {"Software", new SoftwarePanel(this)},
-    {"sunnypilot", new SunnypilotPanel(this)},
   };
 
 #ifdef ENABLE_MAPS
@@ -368,7 +360,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QFrame(parent) {
   QObject::connect(map_panel, &MapPanel::closeSettings, this, &SettingsWindow::closeSettings);
 #endif
 
-  const int padding = panels.size() > 3 ? 15 : 35;
+  const int padding = panels.size() > 3 ? 25 : 35;
 
   nav_btns = new QButtonGroup(this);
   for (auto &[name, panel] : panels) {
@@ -431,76 +423,4 @@ void SettingsWindow::hideEvent(QHideEvent *event) {
 #ifdef QCOM
   HardwareEon::close_activities();
 #endif
-}
-
-SunnypilotPanel::SunnypilotPanel(QWidget* parent) : QWidget(parent) {
-  main_layout = new QStackedLayout(this);
-  home = new QWidget(this);
-  QVBoxLayout* fcr_layout = new QVBoxLayout(home);
-  fcr_layout->setContentsMargins(0, 20, 0, 20);
-
-  QString set = QString::fromStdString(Params().get("CarModel"));
-
-  QPushButton* setCarBtn = new QPushButton(set.length() ? set : "Set your car");
-  setCarBtn->setObjectName("setCarBtn");
-  setCarBtn->setStyleSheet("margin-right: 30px;");
-  connect(setCarBtn, &QPushButton::clicked, [=]() { main_layout->setCurrentWidget(setCar); });
-  fcr_layout->addSpacing(10);
-  fcr_layout->addWidget(setCarBtn, 0, Qt::AlignRight);
-  fcr_layout->addSpacing(10);
-
-  home_widget = new QWidget(this);
-  QVBoxLayout* toggle_layout = new QVBoxLayout(home_widget);
-  home_widget->setObjectName("homeWidget");
-
-  ScrollView *scroller = new ScrollView(home_widget, this);
-  fcr_layout->addWidget(scroller, 1);
-
-  main_layout->addWidget(home);
-
-  setCar = new ForceCarRecognition(this);
-  connect(setCar, &ForceCarRecognition::backPress, [=]() { main_layout->setCurrentWidget(home); });
-  connect(setCar, &ForceCarRecognition::selectedCar, [=]() {
-    QString set = QString::fromStdString(Params().get("CarModel"));
-    setCarBtn->setText(set.length() ? set : "Set your car");
-    main_layout->setCurrentWidget(home);
-  });
-  main_layout->addWidget(setCar);
-
-  QPalette pal = palette();
-  pal.setColor(QPalette::Background, QColor(0x29, 0x29, 0x29));
-  setAutoFillBackground(true);
-  setPalette(pal);
-
-  setStyleSheet(R"(
-    #backBtn, #setCarBtn {
-      font-size: 50px;
-      margin: 0px;
-      padding: 20px;
-      border-width: 0;
-      border-radius: 30px;
-      color: #dddddd;
-      background-color: #444444;
-    }
-  )");
-
-  QList<ParamControl*> toggles;
-
-  for (ParamControl *toggle : toggles) {
-    if (main_layout->count() != 0) {
-      toggle_layout->addWidget(horizontal_line());
-    }
-    toggle_layout->addWidget(toggle);
-  }
-
-  toggle_layout->addWidget(horizontal_line());
-  toggle_layout->addWidget(new AutoLaneChangeTimer());
-  toggle_layout->addWidget(horizontal_line());
-  toggle_layout->addWidget(new BrightnessControl());
-  toggle_layout->addWidget(horizontal_line());
-  toggle_layout->addWidget(new OnroadScreenOff());
-  toggle_layout->addWidget(horizontal_line());
-  toggle_layout->addWidget(new OnroadScreenOffBrightness());
-  toggle_layout->addWidget(horizontal_line());
-  toggle_layout->addWidget(new MaxTimeOffroad());
 }

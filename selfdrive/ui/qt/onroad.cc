@@ -215,7 +215,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
   QWidget *btns_wrapper = new QWidget;
   QHBoxLayout *btns_layout  = new QHBoxLayout(btns_wrapper);
   btns_layout->setSpacing(0);
-  btns_layout->setContentsMargins(300, 0, 30, 30);
+  btns_layout->setContentsMargins(43, 0, 0, 60);
 
   main_layout->addWidget(btns_wrapper, 0, Qt::AlignBottom);
 
@@ -240,7 +240,7 @@ ButtonsWindow::ButtonsWindow(QWidget *parent) : QWidget(parent) {
   });
   dlpBtn->setFixedWidth(200);
   dlpBtn->setFixedHeight(200);
-  btns_layout->addWidget(dlpBtn, 0, Qt::AlignRight);
+  btns_layout->addWidget(dlpBtn, 0, Qt::AlignLeft);
   btns_layout->addSpacing(35);
 
   if (QUIState::ui_state.scene.end_to_end) {
@@ -363,7 +363,6 @@ void OnroadHud::updateState(const UIState &s) {
   setProperty("maxSpeed", maxspeed_str);
   setProperty("speedUnit", s.scene.is_metric ? "km/h" : "mph");
   setProperty("status", s.status);
-  setProperty("is_brakelight_on", sm["carState"].getCarState().getBrakeLights());
   setProperty("madsEnabled", sm["controlsState"].getControlsState().getMadsEnabled());
   setProperty("suspended", sm["controlsState"].getControlsState().getSuspended());
 
@@ -441,9 +440,6 @@ void OnroadHud::updateState(const UIState &s) {
   setProperty("steeringTorqueEps", carState.getSteeringTorqueEps());
   setProperty("bearingAccuracyDeg", gpsLocationExternal.getBearingAccuracyDeg());
   setProperty("bearingDeg", gpsLocationExternal.getBearingDeg());
-
-  setProperty("standStill", carState.getStandStill());
-  setProperty("standstillElapsedTime", sm["lateralPlan"].getLateralPlan().getStandstillElapsed());
 }
 
 void OnroadHud::paintEvent(QPaintEvent *event) {
@@ -475,14 +471,14 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
 
   // current speed
   configFont(p, "Open Sans", 176, "Bold");
-  drawSpeedText(p, rect().center().x(), 210, speed, is_brakelight_on ? QColor(0xff, 0, 0, 255) : QColor(0xff, 0xff, 0xff, 255));
+  drawText(p, rect().center().x(), 210, speed);
   configFont(p, "Open Sans", 66, "Regular");
   drawText(p, rect().center().x(), 290, speedUnit, 200);
 
   if (is_cruise_set) {
-    drawVisionTurnControllerUI(p, rect().right() - 220 - bdr_s, int(bdr_s * 1.5), 184, vtcColor, vtcSpeed, 100);
+    drawVisionTurnControllerUI(p, rect().right() - 215 - bdr_s, int(bdr_s * 1.5), 184, vtcColor, vtcSpeed, 100);
   } else {
-    drawVisionTurnControllerUI(p, rect().right() - 220 - bdr_s, int(bdr_s * 1.5), 184, vtcColor, maxSpeed, 100);
+    drawVisionTurnControllerUI(p, rect().right() - 215 - bdr_s, int(bdr_s * 1.5), 184, vtcColor, maxSpeed, 100);
   }
 
   if (engageable) {
@@ -502,15 +498,10 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
       rc.moveTop(speed_sgn_rc.bottom() + bdr_s);
       drawTrunSpeedSign(p, rc, turnSpeedLimit, tscSubText, curveSign, tscActive);
     }
-
-    // Stand Still Timer
-    if (standStill) {
-      drawStandstillTimer(p, rect().right() - 650, 30 + 160 + 250);
-    }
   }
 
   // MADS icon
-  drawMadsIcon(p, rect().right() - radius / 2 - bdr_s * 2 - 184, radius / 2 + int(bdr_s * 1.5),
+  drawMadsIcon(p, rect().right() - radius / 2 - bdr_s * 2 - 210, radius / 2 + int(bdr_s * 1.5),
            madsEnabled ? suspended ? mads_imgs[0] : mads_imgs[1] : mads_imgs[0], QColor(75, 75, 75, 75), 1.0);
 
   // Bottom bar road name
@@ -532,7 +523,7 @@ void OnroadHud::paintEvent(QPaintEvent *event) {
     } else if (devUiEnabled == 2) {
       drawRightDevUi(p, rect().right() - 184 - bdr_s * 2, bdr_s * 2 + rc2.height());
       drawRightDevUi2(p, rect().right() - 184 - bdr_s * 2 - 184, bdr_s * 2 + rc2.height());
-      drawRightDevUiBorder(p, rect().right() - 184 - bdr_s * 2 - 184, bdr_s * 2 + rc2.height());
+      drawRightDevUiBorder(p, rect().right() - 200 - bdr_s * 2 - 184, bdr_s * 2 + rc2.height());
     }
   }
 }
@@ -544,16 +535,6 @@ void OnroadHud::drawText(QPainter &p, int x, int y, const QString &text, int alp
   real_rect.moveCenter({x, y - real_rect.height() / 2});
 
   p.setPen(QColor(0xff, 0xff, 0xff, alpha));
-  p.drawText(real_rect.x(), real_rect.bottom(), text);
-}
-
-void OnroadHud::drawSpeedText(QPainter &p, int x, int y, const QString &text, QColor color) {
-  QFontMetrics fm(p.font());
-  QRect init_rect = fm.boundingRect(text);
-  QRect real_rect = fm.boundingRect(init_rect, 0, text);
-  real_rect.moveCenter({x, y - real_rect.height() / 2});
-
-  p.setPen(color);
   p.drawText(real_rect.x(), real_rect.bottom(), text);
 }
 
@@ -727,21 +708,13 @@ int OnroadHud::drawDevUiElementLeft(QPainter &p, int x, int y, const char* value
 
   if (strlen(units) > 0) {
     p.save();
-    p.translate(x + 11, y + 37 + 25);
+    p.translate(x - 5, y + 37 + 25);
     p.rotate(90);
     drawText(p, 0, 0, QString(units), 255);
     p.restore();
   }
 
   return 110;
-}
-
-void OnroadHud::drawStandstillTimerText(QPainter &p, int x, int y, const char* label, const char* value, QColor &color1, QColor &color2) {
-  configFont(p, "Open Sans", 125, "SemiBold");
-  drawColoredText(p, x, y, QString(label), color1);
-
-  configFont(p, "Open Sans", 150, "SemiBold");
-  drawColoredText(p, x, y + 150, QString(value), color2);
 }
 
 void OnroadHud::drawRightDevUi(QPainter &p, int x, int y) {
@@ -983,7 +956,7 @@ void OnroadHud::drawRightDevUi2(QPainter &p, int x, int y) {
 
 void OnroadHud::drawRightDevUiBorder(QPainter &p, int x, int y) {
   int rh = 580;
-  int rw = 184;
+  int rw = 192;
   p.setPen(QPen(QColor(0xff, 0xff, 0xff, 100), 6));
   p.setBrush(QColor(0, 0, 0, 0));
   if (devUiEnabled == 2) {
@@ -991,25 +964,6 @@ void OnroadHud::drawRightDevUiBorder(QPainter &p, int x, int y) {
   }
   QRect ldu(x, y, rw, rh);
   p.drawRoundedRect(ldu, 20, 20);
-}
-
-void OnroadHud::drawStandstillTimer(QPainter &p, int x, int y) {
-  char lab_str[16];
-  char val_str[16];
-  int minute = 0;
-  int second = 0;
-  QColor labelColor = QColor(255, 175, 3, 240);
-  QColor valueColor = QColor(255, 255, 255, 240);
-
-  minute = (int)(standstillElapsedTime / 60);
-  second = (int)((standstillElapsedTime) - (minute * 60));
-
-  if (standStill) {
-    snprintf(lab_str, sizeof(lab_str), "STOP");
-    snprintf(val_str, sizeof(val_str), "%01d:%02d", minute, second);
-  }
-
-  drawStandstillTimerText(p, x, y, lab_str, val_str, labelColor, valueColor);
 }
 
 // NvgWindow
