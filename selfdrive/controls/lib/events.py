@@ -251,7 +251,7 @@ def wrong_car_mode_alert(CP: car.CarParams, sm: messaging.SubMaster, metric: boo
   text = "Cruise Mode Disabled"
   if CP.carName == "honda":
     text = "Main Switch Off"
-  return NoEntryAlert(text)
+  return NormalPermanentAlert(text)
 
 
 def joystick_alert(CP: car.CarParams, sm: messaging.SubMaster, metric: bool, soft_disable_time: int) -> Alert:

@@ -172,7 +172,7 @@ class CarState(CarStateBase):
             self.lkasEnabled = True
           self.prev_acc_mads_combo = ret.cruiseState.enabled
     else:
-      self.lkasEnabled = False
+      self.lkasEnabled = True
 
     if self.prev_cruise_buttons != 0: # CANCEL
       if self.cruise_buttons == 0:
