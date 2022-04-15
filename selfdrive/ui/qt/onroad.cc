@@ -350,7 +350,7 @@ void OnroadHud::updateState(const UIState &s) {
   const SubMaster &sm = *(s.sm);
   const auto cs = sm["controlsState"].getControlsState();
 
-  float maxspeed = cs.getVCruise();
+  float maxspeed = cs.getVCruise() * 1.03;
   bool cruise_set = maxspeed > 0 && (int)maxspeed != SET_SPEED_NA;
   if (cruise_set && !s.scene.is_metric) {
     maxspeed *= KM_TO_MILE;
@@ -376,7 +376,7 @@ void OnroadHud::updateState(const UIState &s) {
 
     const auto lp = sm["longitudinalPlan"].getLongitudinalPlan();
     const auto vtcState = lp.getVisionTurnControllerState();
-    const float vtc_speed = lp.getVisionTurnSpeed() * (s.scene.is_metric ? MS_TO_KPH : MS_TO_MPH);
+    const float vtc_speed = lp.getVisionTurnSpeed() * (s.scene.is_metric ? MS_TO_KPH : MS_TO_MPH) * 1.03;
 
     setProperty("showVTC", vtcState > cereal::LongitudinalPlan::VisionTurnControllerState::DISABLED);
     setProperty("vtcSpeed", QString::number(std::nearbyint(vtc_speed)));

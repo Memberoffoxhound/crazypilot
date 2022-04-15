@@ -3,7 +3,7 @@ import numpy as np
 class Conversions:
   #Speed
   MPH_TO_KPH = 1.609344
-  KPH_TO_MPH = 1. / MPH_TO_KPH
+  KPH_TO_MPH = 1. / MPH_TO_KPH / 1.03
   MS_TO_KPH = 3.6
   KPH_TO_MS = 1. / MS_TO_KPH
   MS_TO_MPH = MS_TO_KPH * KPH_TO_MPH
