@@ -27,8 +27,8 @@ void Sidebar::drawMetric(QPainter &p, const QString &label, const QString &val, 
   } else {
     configFont(p, "Open Sans", 35, "Bold");
     p.drawText(rect.x() + 80, rect.y() + 50, label);
-    configFont(p, "Open Sans", 42, "Bold");
-    p.drawText(rect.x() + 80, rect.y() + 32 + 70, val);
+    configFont(p, "Open Sans", 40, "Bold");
+    p.drawText(rect.x() + 83, rect.y() + 32 + 70, val);
   }
 }
 
